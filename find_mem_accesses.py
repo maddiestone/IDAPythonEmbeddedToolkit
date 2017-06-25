@@ -41,9 +41,19 @@ import re
 # Also enter the index of the operand in the instruction so that it can be retrieved via
 # the GetOperandValue() function. 
 #
-# 8051 (movx DPTR, #addr)
-regex_mem_instruct = re.compile(r"mov +DPTR, #")
-operand_index = 1
+
+processor_name = idaapi.get_inf_structure().procName
+
+if processor_name == "8051":
+	# 8051 (movx DPTR, #addr)
+	regex_mem_instruct = re.compile(r"mov +DPTR, #")
+	operand_index = 1
+else:
+	print "[find_mem_accesses.py] UNSUPPORTED PROCESSOR. Processor = %s is not supported. Exiting." % processor_name
+	raise NotImplementedError("Unsupported Processor Type")
+
+print "[find_mem_accesses.py] Processor = %s -- Reg Expressions Selected. Proceeding." % processor_name
+
 ############################################################
 
 
