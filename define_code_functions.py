@@ -61,9 +61,10 @@ elif processor_name == 'AVR':
 	smart_epilog = re.compile(r"reti{0,1}")
 
 else:
-	raise NotImplementedError('Unsupported processor type.')
+	print "[define_code_functions.py] UNSUPPORTED PROCESSOR. Processor = %s is unsupported. Exiting." % processor_name
+	raise NotImplementedError('Unsupported Processor Type.')
 
-
+print "[define_code_functions.py] Processor = %s -- Reg Expressions Selected. Proceeding." % processor_name
 ############################################################
 
 start_addr = AskAddr(MinEA(), "Please enter the starting address for the data to be defined.")
