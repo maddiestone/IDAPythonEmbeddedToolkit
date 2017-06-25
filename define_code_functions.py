@@ -25,31 +25,45 @@
 #
 ##############################################################################################
 import re
+import idaapi
 
 ################### USER DEFINED VALUES ###################
 # Enter a regular expression for how this architecture usually begins and ends functions.
 # If the architecture does not dictate how to start or end a function use r".*" to allow
 # for any instruction
 
-# 8051 Architecture Prologue and Epilogue
-smart_prolog = re.compile(r".*")
-smart_epilog = re.compile(r"reti{0,1}")
+processor_name = idaapi.get_inf_structure().procName
 
-# PIC18 Architecture Prologue and Epilogue
-#smart_prolog = re.compile(r".*")
-#smart_epilog = re.compile(r"return  0")
 
-# Mitsubishi M32R Architecutre Prologue and Epilogue
-#smart_prolog = re.compile(r"push +lr")
-#smart_epilog = re.compile(r"jmp +lr.*")
+if processor_name == '8051':
+	# 8051 Architecture Prologue and Epilogue
+	smart_prolog = re.compile(r".*")
+	smart_epilog = re.compile(r"reti{0,1}")
 
-# Texas Instruments TMS320C28x
-#smart_prolog = re.compile(r".*")
-#smart_epilog = re.compile(r"lretr")
+elif processor_name == 'PIC18Cxx':
+	# PIC18 Architecture Prologue and Epilogue
+	smart_prolog = re.compile(r".*")
+	smart_epilog = re.compile(r"return  0")
 
-# AVR
-#smart_prolog = re.compile(r"push +r")
-#smart_epilog = re.compile(r"reti{0,1}")
+elif processor_name == 'm32r':
+	# Mitsubishi M32R Architecutre Prologue and Epilogue
+	smart_prolog = re.compile(r"push +lr")
+	smart_epilog = re.compile(r"jmp +lr.*")
+
+elif processor_name == 'TMS32028':
+	# Texas Instruments TMS320C28x
+	smart_prolog = re.compile(r".*")
+	smart_epilog = re.compile(r"lretr")
+
+elif processor_name == 'AVR':
+	# AVR
+	smart_prolog = re.compile(r"push +r")
+	smart_epilog = re.compile(r"reti{0,1}")
+
+else:
+	raise NotImplementedError('Unsupported processor type.')
+
+
 ############################################################
 
 start_addr = AskAddr(MinEA(), "Please enter the starting address for the data to be defined.")
