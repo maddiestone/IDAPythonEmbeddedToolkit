@@ -69,6 +69,10 @@ to help with the static analysis:
 		referencing instruction.
 	3. 	A dictionary of all of the memory addresses accessed and the referencing instructions'
 		addresses are printed and saved to a file.
+* **identify_operand_locations.py -- Identify Instructions that Reference an Operand**
+Identifies the instructions in the range start_addr to end_addr that reference the 
+input operand (regex_operand). The addresses of all instructions where the operand is 
+found are printed to the IDA output window and saved to a file.
 
 ## Copyright
 Copyright 2017 The Johns Hopkins University Applied Physics Laboratory LLC
