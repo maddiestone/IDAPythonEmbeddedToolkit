@@ -25,11 +25,16 @@
 #
 # Inputs: 	start_addr: 	Start address for segment to define as data
 #			end_addr:		End address for segment to define as data
+#           ignore_addrs:   Addresses of functions that should not be considered as "noXref"
+#                           For Example, RESET should be listed here
 #
 ##############################################################################################
 
 ################### USER DEFINED VALUES ###################
-# None needed.
+# Function Addresses that should not be considered "No Crossreferences/Dead"
+# For example, the reset and interrupt vectors don't have cross-references but should
+# not be labeled as such.
+ignore_addrs = (0x0, 0x8, 0x18)
 ###########################################################
 			
 def addPrefixToFunctionName(prefix, functionAddr):
@@ -55,7 +60,7 @@ if ((start_addr is not None and end_addr is not None) and (start_addr != BADADDR
 	# having no code reference paths are found. 
 	new_noXrefs_found = False
 	while (curr_addr != BADADDR and curr_addr < end_addr):
-		if (not GetFunctionName(curr_addr).startwith("noXrefs_")):
+		if (curr_addr not in ignore_addrs and (not GetFunctionName(curr_addr).startswith("noXrefs_"))):
 			xrefs = XrefsTo(curr_addr)
 			has_valid_xref = False;
 			for x in xrefs:
@@ -72,7 +77,7 @@ if ((start_addr is not None and end_addr is not None) and (start_addr != BADADDR
 				print "[label_funcs_with_no_xrefs.py] Iterating through range again because new functions with no Xrefs found."
 				curr_addr = start_addr
 				new_noXrefs_found = False
-			
+		curr_addr = NextFunction(curr_addr)	
 	print "[label_funcs_with_no_xrefs.py] FINISHED."
 else:
 	print "[label_funcs_with_no_xrefs.py] QUITTING. Invalid address(es) entered."
