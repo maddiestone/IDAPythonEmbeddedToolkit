@@ -8,6 +8,7 @@ The IDAPython Embedded Toolkit has been presented at the following venues:
     Recording of Talk: http://www.irongeek.com/i.php?page=videos/derbycon7/t215-idapython-the-wonder-woman-of-embedded-device-reversing-maddie-stone <br/>
     Slides and Demo Videos from Presentation are available in the [presentations](presentations/) folder
 * RECON Montreal "The Life-Changing Magic of IDAPython: Embedded Device Edition" -- June 2017 <br/>
+    Recording of Talk: https://recon.cx/media-archive/2017/mtl/recon2017-mtl-20-maddie-stone-The-Life-Changing-Magic-of-IDAPython-Embedded-Device-Edition.mp4
     Slides and Demo Videos from Presentation are available in the [presentations](presentations/) folder
 
 # Getting Started
