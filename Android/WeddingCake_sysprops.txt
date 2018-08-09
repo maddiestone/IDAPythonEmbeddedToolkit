@@ -1,0 +1,38 @@
+System Property Checked,Value that Causes Exit
+init.svc.gce_fs_monitor,running
+init.svc.dempeventlog,running
+init.svc.dumpipclog,running
+init.svc.dumplogcat,running
+init.svc.dumplogcat-efs,running
+init.svc.filemon,running
+ro.hardware.virtual_device,gce_x86
+ro.kernel.androidboot.hardware,gce_x86
+ro.hardware.virtual_device,gce_x86
+ro.boot.hardware,gce_x86
+ro.boot.selinux,disable
+ro.factorytest,true OR 1 OR y
+ro.kernel.android.checkjni,true OR 1 OR y
+ro.hardware.virtual_device,vbox86
+ro.kernel.androidboot.hardware,vbox86
+ro.hardware,vbox86
+ro.boot.hardware,vbox86
+ro.build.product,google_sdk
+ro.build.product,Droid4x
+ro.build.product,sdk_x86
+ro.build.product,sdk_google
+ro.build.product,vbox86p
+ro.product.manufacturer,Genymotion
+ro.product.brand,generic
+ro.product.brand,generic_x86
+ro.product.device,generic
+ro.product.device,generic_x86
+ro.product.device,generic_x86_x64
+ro.product.device,Droid4x
+ro.product.device,vbox86p
+ro.kernel.androidboot.hardware,goldfish
+ro.hardware,goldfish
+ro.boot.hardware,goldfish
+ro.hardware.audio.primary,goldfish
+ro.kernel.androidboot.hardware,ranchu
+ro.hardware,ranchu
+ro.boot.hardware,ranchu
