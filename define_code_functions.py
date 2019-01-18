@@ -81,7 +81,7 @@ if ((start_addr is not None and end_addr is not None) and (start_addr != BADADDR
 		curr_addr = start_addr
 		print "[make_code_functions.py] Running script to define code and functions on 0x%x to 0x%x" % (start_addr, end_addr)
 		while (curr_addr < end_addr):
-			next_unexplored = FindUnexplored(curr_addr, idaapi.BIN_SEARCH_FORWARD)
+			next_unexplored = FindUnexplored(curr_addr, idaapi.SEARCH_DOWN)
 			MakeCode(next_unexplored)		# We don't care whether it succeeds or fails so not storing retval
 			curr_addr = next_unexplored
 
