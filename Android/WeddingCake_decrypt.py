@@ -64,13 +64,15 @@ def arith_shift_rt(num, shifts):
 """ Signed Branch if Less than or Equal
 """
 def signed_ble(left_reg, right_reg):
-    if (left_reg & 0x80000000):
-        if (not(right_reg & 0x80000000)):
+    if (left_reg & 0x80000000): #left_reg is negative
+        if (not(right_reg & 0x80000000)): #right_reg is positve
             return True
-    else:
-        if (right_reg & 0x80000000):
+        else: #left_reg and right_reg are negative
+            return left_reg >= right_reg
+    else: #left_reg is positve
+        if (right_reg & 0x80000000): #right_reg is negative
             return False
-    return left_reg <= right_reg
+    return left_reg <= right_reg #left_reg and right_reg are positive
 
 """ Decrypts array of bytes and writes decrypted bytes back to array argument.
 """
