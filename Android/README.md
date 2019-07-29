@@ -19,6 +19,8 @@ the IDA database.
 *WeddingCake_sysprops.txt*: All of the system properties that WeddingCake
 checks for and the values that will cause the application to exit.
 
+*jni_translate.py*: An IDA plugin that translates JNIEnv offsets to the actual function signature and makes that information available to an analyst.
+
 Copyright 2018 Google LLC.
 Author: maddiestone@google.com (Maddie Stone)
 
