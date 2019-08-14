@@ -18,6 +18,7 @@ min_func_len = 0x8
 jnienv = {}
 last_inst_not_for_jnie = False
 last_inst_not_mtd3 = False
+called_blx = False
 
 
 REGEX_PUSH = re.compile(r"PUSH +\{(R[0-9]+,?)+ *(-R[0-9]+,)? *(LR)?\}")
@@ -27,6 +28,8 @@ REGEX_LDR_JNIE = re.compile(r"LDR +R[0-9]+, +\[R[0-9]+\]")
 REGEX_OPT_ADD = re.compile(r"ADDS +R[0-9]+, +(#[0-9]{1,3}|#0x[0-9A-Fa-f]{1,3})")
 # MOVS    R3, #8|#0x8
 REGEX_OPT_MOV = re.compile(r"MOVS +R[0-9]+, +(#[0-9]{1,3}|#0x[0-9A-Fa-f]{1,3})")
+# LSLS    R0, R0, #2
+REGEX_OPT_LSL = re.compile(r"LSLS? +R[0-9]+, +R[0-9]+, +(#[0-9]+|#0x[0-9A-Fa-f]+)")
 # MOV     R12, R3
 REGEX_MOV = re.compile(r"MOV +R[0-9]+, +R[0-9]+")
 # LDR     R4, [R4,#67]
@@ -68,14 +71,14 @@ def match_ldr_jnie(disasm):
   Returns:
    True True or False depending on whether the instruction loads JNIEnv ptr
   """
-  global regs_offsets, regs_loads
+  global regs_offsets, regs_loads, called_blx
   # some instructions have comment, remove the comments
   disasm = remove_comment_from_disasm(disasm)
   # get the reg that now holds JNIEnv ptr
   disasm = disasm.split("LDR")[1].split(",")
   loc_jnie = disasm[0].strip()
   loc_source = disasm[1].strip()[1:-1]
-  if loc_jnie in regs_loads and regs_loads[loc_jnie]:
+  if loc_jnie in regs_loads and regs_loads[loc_jnie] and not called_blx:
     return False
   if loc_source in regs_offsets and regs_offsets[loc_source] != -1:
     return False
@@ -83,6 +86,7 @@ def match_ldr_jnie(disasm):
   regs_offsets[loc_jnie] = 0
   # saying that the current reg holds JNIEnv ptr
   regs_loads[loc_jnie] = True
+  called_blx = False
   return True
 
 
@@ -142,6 +146,32 @@ def match_mov(disasm):
     regs_loads[dest_reg] = regs_loads[source_reg]
   else:
     regs_loads[dest_reg] = False
+
+
+def match_lsl(disasm):
+  """process instruction that shifts the content of a register left.
+  E.g LSLS    R0, R0, #2.
+
+  Args:
+   disasm: (str) disassembly of the current instruction.
+  """
+  global regs_offsets, regs_loads
+  disasm = remove_comment_from_disasm(disasm)
+  if "LSLS" in disasm:
+    disasm = disasm.split("LSLS")[1]
+  else:
+    disasm = disasm.split("LSL")[1]
+  disasm = disasm.split(",")
+  if len(disasm) == 3:
+    source_reg = disasm[1].strip()
+    if source_reg in regs_offsets:
+      dest_reg = disasm[0].strip()
+      off = disasm[2].strip()[1:]
+      if "0x" in off:
+        off = int(off[2:], 16)
+      offset = int(off)
+      regs_offsets[dest_reg] =  regs_offsets[source_reg] * pow(2, offset)
+  return
 
 
 def match_ldr_mtd1_and_4(disasm):
@@ -244,7 +274,7 @@ def match_blx(ea, disasm):
   Returns:
    True or False depending on whether instruction loads the function ptr.
   """
-  global regs_offsets, regs_loads, jnienv, num
+  global regs_offsets, regs_loads, jnienv, num, called_blx
   disasm = remove_comment_from_disasm(disasm)
   callee = disasm.split("BLX")[1].strip()
   if callee in regs_offsets and str(regs_offsets[callee]) in jnienv:
@@ -252,6 +282,7 @@ def match_blx(ea, disasm):
     num += 1
   regs_offsets[callee] = -1
   regs_loads[callee] = False
+  called_blx = True
 
 
 def others_lds(disasm):
@@ -316,6 +347,11 @@ def extract_routines():
       # in match_mov(disasm)
       elif REGEX_MOV.match(disasm):
         match_mov(disasm)
+        ea = idc.NextHead(ea)
+
+      # check if a shift operation is performed
+      elif REGEX_OPT_LSL.match(disasm):
+        match_lsl(disasm)
         ea = idc.NextHead(ea)
 
       # instns that match this regex may be loading the exact function ptr.
@@ -761,6 +797,7 @@ def run_test():
   test_regex_ldr_jnie()
   test_regex_opt_add()
   test_regex_opt_mov()
+  test_regex_opt_lsl()
   test_regex_mov()
   test_regex_ldr_mtd1()
   test_regex_ldr_mtd14()
@@ -790,6 +827,12 @@ def test_regex_opt_add():
 def test_regex_opt_mov():
   """TEST regex_REGEX_OPT_MOV."""
   print(REGEX_OPT_MOV.match("MOVS    R3, #0x17C"), "Should pass movs")
+
+
+def test_regex_opt_lsl():
+  """TEST REGEX_OPT_LSL"""
+  print(REGEX_OPT_LSL.match("LSL R7, R7, #2"), "pass lsl")
+  print(REGEX_OPT_LSL.match("LSLS R7, R7, #2"), "pass lsls")
 
 
 def test_regex_mov():
